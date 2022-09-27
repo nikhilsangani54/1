@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<project name="xecan-management" basedir="." default="build">
+  <path id="build.classpath">
+    <fileset dir="./libs">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+  
+  <target name="init">
+    <property name="build" value="build" />
+    <property name="webapp" value="webapp" />
+    <property name="metadata" value="metadata" />
+    <property name="dist" value="dist" />
+    <property name="src" value="src" />
+    <property name="debug" value="true" />
+    <tstamp><format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" /></tstamp>
+  </target>
+  
+  <target name="clean" depends="init">
+    <delete failonerror="false">
+      <fileset dir="${src}" casesensitive="no" defaultexcludes="no">
+	<include name="**/*~" />
+	<include name="**/*.class" />
+      </fileset>
+      <fileset dir="${webapp}" casesensitive="no" defaultexcludes="no">
+	<include name="**/*~" />
+      </fileset>
+      <fileset dir="${build}" includes="**/*.class" />
+      <fileset dir="${dist}" includes="${ant.project.name}.jar,${ant.project.name}.war,${ant.project.name}.ear" />
+      <fileset dir="." casesensitive="no" defaultexcludes="no">
+	<include name="**/*~" />
+      </fileset>
+    </delete>
+  </target>
+  
+  <target name="compile" depends="init">
+    <mkdir dir="${build}" />
+    <javac debug="${debug}" optimize="${optimize}" destdir="${build}" source="1.8" target="1.8">
+      <src path="${src}" />
+      <classpath refid="build.classpath" />
+    </javac>
+  </target>
+  
+  <target name="jar" depends="compile">
+    <mkdir dir="${dist}" />
+    <jar destfile="${dist}/${ant.project.name}.jar">
+      <manifest>
+	<attribute name="Built-On" value="${build.time}" />
+      </manifest>
+      <fileset dir="${build}">
+	<include name="**/*.class" />
+      </fileset>
+    </jar>
+    <copy toDir="${webapp}/WEB-INF/lib" file="${dist}/${ant.project.name}.jar" />
+  </target>
+
+  <target name="test" depends="jar">
+    <exec executable="java">
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_102.jdk/Contents/Home/" />
+      <!--
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/" />
+      -->
+      <env key="xecan.home" path="/Users/femi/projects/Xecan/" />
+      <arg line="-jar libs/winstone-boot-1.7.0.jar -Dlog4j.configuration=./log4j.properties -Dfile.encoding=UTF-8 --prefix=management --useJNDI=true --jndi.resource.jdbc/RFIDDBPool=javax.sql.DataSource --jndi.param.jdbc/RFIDDBPool.url=jdbc:mysql://192.168.1.166/edx0 --jndi.param.jdbc/RFIDDBPool.username=edx_dba --jndi.param.jdbc/RFIDDBPool.password=edx --webroot=${webapp} --preferredClassLoader=java.net.URLClassLoader --tempDirectory=/tmp/" />
+    </exec>
+  </target>
+
+  <target name="testhome" depends="jar">
+    <exec executable="java">
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_102.jdk/Contents/Home/" />
+      <!--
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/" />
+      -->
+      <env key="xecan.home" path="/Users/femi/projects/Xecan/" />
+      <arg line="-jar libs/winstone-boot-1.7.0.jar -Dfile.encoding=UTF-8 --prefix=management --useJNDI=true --jndi.resource.jdbc/RFIDDBPool=javax.sql.DataSource --jndi.param.jdbc/RFIDDBPool.url=jdbc:mysql://172.16.0.13/edx0 --jndi.param.jdbc/RFIDDBPool.username=edx_dba --jndi.param.jdbc/RFIDDBPool.password=edx --webroot=${webapp} --preferredClassLoader=java.net.URLClassLoader" />
+    </exec>
+  </target>
+
+  <target name="testoffice" depends="jar">
+    <exec executable="java">
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_102.jdk/Contents/Home/" />
+      <!--
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/" />
+      -->
+      <env key="xecan.home" path="/Users/femi/projects/Xecan/" />
+      <env key="XECAN_HOME" path="/Users/femi/projects/Xecan/" />
+      <arg line="-jar libs/winstone-boot-1.7.0.jar -Dfile.encoding=UTF-8 --prefix=management --useJNDI=true --jndi.resource.jdbc/RFIDDBPool=javax.sql.DataSource --jndi.param.jdbc/RFIDDBPool.url=jdbc:mysql://127.0.0.1/textibility --jndi.param.jdbc/RFIDDBPool.username=whiteboards --jndi.param.jdbc/RFIDDBPool.password=whiteboards --webroot=${webapp} --preferredClassLoader=java.net.URLClassLoader" />
+    </exec>
+  </target>
+
+  <target name="test2" depends="jar">
+    <exec executable="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/bin/java">
+
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_102.jdk/Contents/Home/" />
+      <!--
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/" />
+      -->
+      <env key="xecan.home" path="/Users/femi/projects/Xecan/" />
+      <arg line="-jar libs/winstone-boot-1.7.0.jar -Dfile.encoding=UTF-8 --prefix=management --useJNDI=true --jndi.resource.jdbc/RFIDDBPool=javax.sql.DataSource --jndi.param.jdbc/RFIDDBPool.url=jdbc:mysql://192.168.1.128/edx0 --jndi.param.jdbc/RFIDDBPool.username=edx_dba --jndi.param.jdbc/RFIDDBPool.password=edx --webroot=${webapp} --preferredClassLoader=java.net.URLClassLoader" />
+    </exec>
+  </target>
+
+  <target name="testnewoffice" depends="jar">
+    <exec executable="java">
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_102.jdk/Contents/Home/" />
+      <!--
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/" />
+      -->
+      <env key="xecan.home" path="/Users/femi/projects/Xecan/" />
+      <arg line="-jar libs/winstone-boot-1.7.0.jar -Dfile.encoding=UTF-8 --prefix=management --useJNDI=true --jndi.resource.jdbc/RFIDDBPool=javax.sql.DataSource --jndi.param.jdbc/RFIDDBPool.url=jdbc:mysql://192.168.1.4/edx0 --jndi.param.jdbc/RFIDDBPool.username=edx_dba --jndi.param.jdbc/RFIDDBPool.password=edx --webroot=${webapp} --preferredClassLoader=java.net.URLClassLoader" />
+    </exec>
+  </target>
+
+  <target name="testvm" depends="jar">
+    <exec executable="java">
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_102.jdk/Contents/Home/" />
+      <!--
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/" />
+      -->
+      <env key="xecan.home" path="/Users/femi/projects/Xecan/" />
+      <arg line="-jar libs/winstone-boot-1.7.0.jar -Dlog4j.configuration=./log4j.properties -Dfile.encoding=UTF-8 --prefix=management --useJNDI=true --jndi.resource.jdbc/RFIDDBPool=javax.sql.DataSource --jndi.param.jdbc/RFIDDBPool.url=jdbc:mysql://192.168.1.141/edx0 --jndi.param.jdbc/RFIDDBPool.username=edx_dba --jndi.param.jdbc/RFIDDBPool.password=edx --webroot=${webapp} --preferredClassLoader=java.net.URLClassLoader --tempDirectory=/tmp/" />
+    </exec>
+  </target>
+
+  <target name="test100" depends="jar">
+    <exec executable="java">
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_102.jdk/Contents/Home/" />
+      <!--
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/" />
+      -->
+      <env key="xecan.home" path="/Users/femi/projects/Xecan/" />
+      <arg line="-cp libs/winstone-boot-1.7.0.jar;libs/slf4j-api-1.7.29.jar;libs/slf4j-simple-1.7.29.jar -Dlog4j.configuration=./log4j.properties -Dfile.encoding=UTF-8 net.winstone.Winstone --prefix=management --useJNDI=true --jndi.resource.jdbc/RFIDDBPool=javax.sql.DataSource --jndi.param.jdbc/RFIDDBPool.url=jdbc:mysql://192.168.1.100/edx0 --jndi.param.jdbc/RFIDDBPool.username=edx_dba --jndi.param.jdbc/RFIDDBPool.password=edx --webroot=${webapp} --preferredClassLoader=java.net.URLClassLoader --tempDirectory=/tmp/" />
+    </exec>
+  </target>
+
+  <target name="test146" depends="jar">
+    <exec executable="java">
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_102.jdk/Contents/Home/" />
+      <!--
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/" />
+      -->
+      <env key="xecan.home" path="/Users/femi/projects/Xecan/" />
+      <arg line="-cp libs/lib/slf4j-api-1.6.4.jar:libs/lib/slf4j-log4j12-1.6.4.jar:libs/lib/jndi-1.7.0.jar:libs/servlet-api.jar:libs/lib/mysql-connector-java-5.1.36.jar:libs/lib/jasper.jar:libs/lib/ecj-4.6.3.jar:libs/lib/tomcat-api.jar:libs/lib/tomcat-util.jar:libs/lib/juli-6.0.18.jar:libs/lib/jasper-el.jar:libs/lib/el-api.jar:libs/lib/HikariCP-2.4.0.jar:libs/lib/commons-logging-api-5.5.23.jar:libs/lib/jsp-api.jar:libs/lib/log4j-1.2.16.jar:libs/winstone-boot-1.7.0.jar:libs/lib/winstone-1.7.0.jar:libs/oshi-core-4.2.1.jar -Dlog4j.configuration=file:///Users/femi/projects/Xecan/management/log4j.properties -Dfile.encoding=UTF-8 net.winstone.Winstone --prefix=management --useJNDI=true --jndi.resource.jdbc/RFIDDBPool=javax.sql.DataSource --jndi.param.jdbc/RFIDDBPool.url=jdbc:mysql://192.168.1.146/edx0 --jndi.param.jdbc/RFIDDBPool.username=edx_dba --jndi.param.jdbc/RFIDDBPool.password=edx --webroot=${webapp} --preferredClassLoader=java.net.URLClassLoader --tempDirectory=/tmp/ --httpPort=8081 --accessLoggerClassName=net.winstone.accesslog.SimpleAccessLog --simpleAccessLogger.format=combined" />
+    </exec>
+  </target>
+
+  <target name="testmyoffice" depends="jar">
+    <exec executable="java">
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_102.jdk/Contents/Home/" />
+      <!--
+      <env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/" />
+      -->
+      <env key="xecan.home" path="/Users/femi/projects/Xecan/" />
+      <arg line="-jar libs/winstone-boot-1.7.0.jar -Dlog4j.configuration=./log4j.properties -Dfile.encoding=UTF-8 --prefix=management --useJNDI=true --jndi.resource.jdbc/RFIDDBPool=javax.sql.DataSource --jndi.param.jdbc/RFIDDBPool.url=jdbc:mysql://192.168.0.107/edx0 --jndi.param.jdbc/RFIDDBPool.username=edx_dba --jndi.param.jdbc/RFIDDBPool.password=edx --webroot=${webapp} --preferredClassLoader=java.net.URLClassLoader --tempDirectory=/tmp/" />
+    </exec>
+  </target>
+
+  <target name="war" depends="clean,jar">
+      <echo>=== Building the WAR file ===</echo>
+
+      <!-- the ant war task. with all resources in place, create the war file -->
+      <war destfile="${dist}/${ant.project.name}.war" webxml="${webapp}/WEB-INF/web.xml" basedir="webapp">
+        <fileset dir="${webapp}"/>
+        <lib dir="${webapp}/WEB-INF/lib" />
+      </war>
+  </target>
+  
+  <target name="ear" depends="clean,war">
+    <echo>=== Building the EAR file ===</echo>
+    
+    <!-- the ant ear task. with all resources in place, create the war file -->
+    <ear destfile="${dist}/${ant.project.name}.ear" appxml="${metadata}/application.xml">
+      <fileset dir="${dist}" includes="*.war" />
+    </ear>
+  </target>
+
+  <target name="copyear" depends="ear">
+    <copy toDir="/Volumes/BigNas/dev/management/dist" file="${dist}/${ant.project.name}.ear" />
+  </target>
+
+  <target name="build" depends="ear">
+    <mkdir dir="${build}/dist" />
+    <copy toDir="${build}/dist/" file="${dist}/${ant.project.name}.ear" />
+  </target>
+</project>
